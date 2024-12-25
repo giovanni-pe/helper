@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descifrado Afin</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #ecf0f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #ecf0f3;
+            border-radius: 20px;
+            box-shadow: 7px 7px 15px #babecc, -7px -7px 15px #ffffff;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 10px;
+            background: #ecf0f3;
+            box-shadow: inset 5px 5px 10px #babecc, inset -5px -5px 10px #ffffff;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        button {
+            cursor: pointer;
+            background: linear-gradient(145deg, #ffffff, #d3d9de);
+            box-shadow: 5px 5px 10px #babecc, -5px -5px 10px #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #ecf0f3;
+            box-shadow: inset 5px 5px 10px #babecc, inset -5px -5px 10px #ffffff;
+        }
+
+        .result {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #333;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Descifrado Afin</h1>
+        <label for="textoCifrado">Texto Cifrado</label>
+        <input type="text" id="textoCifrado" placeholder="Ingresa el texto cifrado" />
+
+        <label for="constanteMultiplicativa">Constante Multiplicativa (a)</label>
+        <input type="number" id="constanteMultiplicativa" placeholder="Ingresa la constante a" />
+
+        <label for="constanteAditiva">Constante Aditiva (b)</label>
+        <input type="number" id="constanteAditiva" placeholder="Ingresa la constante b" />
+
+        <label for="modulo">Módulo</label>
+        <input type="number" id="modulo" placeholder="Ingresa el módulo (27 o 26)" />
+
+        <label for="idioma">Idioma</label>
+        <select id="idioma">
+            <option value="es">Español</option>
+            <option value="en">Inglés</option>
+        </select>
+
+        <button onclick="descifrarTexto()">Descifrar</button>
+
+        <div class="result" id="resultado"></div>
+    </div>
+
+    <script>
+        function inversoMultiplicativo(a, m) {
+            a = a % m;
+            for (let x = 1; x < m; x++) {
+                if ((a * x) % m === 1) return x;
+            }
+            return null;
+        }
+
+        function descifrarTexto() {
+            const textoCifrado = document.getElementById("textoCifrado").value.toLowerCase();
+            const a = parseInt(document.getElementById("constanteMultiplicativa").value);
+            const b = parseInt(document.getElementById("constanteAditiva").value);
+            const modulo = parseInt(document.getElementById("modulo").value);
+            const idioma = document.getElementById("idioma").value;
+
+            // Definir el alfabeto
+            let alfabeto = idioma === "es" 
+                ? "abcdefghijklmnñopqrstuvwxyz " 
+                : "abcdefghijklmnopqrstuvwxyz ";
+            alfabeto = alfabeto.slice(0, modulo);
+
+            const inverso = inversoMultiplicativo(a, modulo);
+            if (inverso === null) {
+                document.getElementById("resultado").innerText = "No existe inverso multiplicativo para a.";
+                return;
+            }
+
+            let resultado = "";
+            for (const letra of textoCifrado) {
+                const index = alfabeto.indexOf(letra);
+                if (index !== -1) {
+                    const descifradoIndex = (inverso * (index - b + modulo)) % modulo;
+                    resultado += alfabeto[descifradoIndex];
+                } else {
+                    resultado += letra; // Conservar caracteres no reconocidos
+                }
+            }
+
+            document.getElementById("resultado").innerText = `Texto descifrado: ${resultado}`;
+        }
+    </script>
+</body>
+</html>
